@@ -23,6 +23,31 @@
     <link rel="stylesheet" href="./assets/styles/porn-hub.css">
     <link id="dark-style" class="dark-theme" rel="stylesheet" href="./assets/styles/style-dark.css">
     <style>
+        /* CSS cho Video Nền */
+        
+        #background-video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+            /* Đặt phía sau mọi thứ */
+            transform: translateX(-50%) translateY(-50%);
+            background-size: cover;
+            filter: brightness(50%);
+            /* Giảm độ sáng của video */
+        }
+        /* Đảm bảo nội dung chính nằm trên video */
+        
+        .main {
+            position: relative;
+            z-index: 10;
+        }
+        /* Các icon mạng xã hội */
+        
         .social-icons {
             display: flex;
             justify-content: center;
@@ -41,9 +66,11 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            /* Tăng shadow để nổi bật */
             border: 2px solid white;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
+            /* Làm mờ nền icon */
         }
         
         .social-icon::before {
@@ -63,7 +90,7 @@
         
         .social-icon:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
         
         .social-icon i {
@@ -115,10 +142,120 @@
             border-style: solid;
             border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
         }
+        /* 1. Đảm bảo nội dung có độ trong suốt để nhìn thấy video nền */
+        
+        .box {
+            /* Giảm opacity của nền trắng */
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+        }
+        /* 2. Fix Dark Mode và độ trong suốt cho nền Dark */
+        
+        .dark-theme .box {
+            /* Thay đổi màu nền sang đen mờ */
+            background-color: rgba(30, 30, 30, 0.85);
+            /* Đảm bảo màu chữ hiển thị tốt trên nền đen */
+            color: #ffffff;
+        }
+        /* 3. Fix lỗi mất chữ (tiêu đề, chữ thường) khi chuyển Dark Mode */
+        
+        .dark-theme h1,
+        .dark-theme h3,
+        .dark-theme h4,
+        .dark-theme h5,
+        .dark-theme .title,
+        .dark-theme .title__separate::before,
+        .dark-theme .title__separate::after {
+            color: #ffffff !important;
+            /* Đặt màu chữ trắng cho tất cả tiêu đề */
+        }
+        
+        .dark-theme p,
+        .dark-theme .case-item__caption,
+        .dark-theme .review-item__caption {
+            color: #cccccc;
+            /* Màu xám nhạt cho chữ thường */
+        }
+        /* 4. Đảm bảo màu nền của các khối con (case-item) cũng thay đổi */
+        
+        .dark-theme .box__second {
+            background-color: rgba(45, 45, 45, 0.85) !important;
+        }
+        
+        .bg-triangles {
+            /* Vô hiệu hóa hình nền tam giác ban đầu nếu có, hoặc thay thế */
+            background-image: none !important;
+        }
+        /* --- CSS MỚI CHO MENU --- */
+        
+        .top-right-nav {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            /* Đảm bảo menu nằm trên các phần tử khác */
+        }
+        
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .menu-item a {
+            text-decoration: none;
+            color: white;
+            /* Màu chữ trắng cho dễ nhìn trên nền video */
+            background-color: rgba(0, 0, 0, 0.6);
+            /* Nền đen mờ */
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .menu-item a:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+        }
+        /* Tối ưu cho Dark Mode */
+        
+        .dark-theme .menu-item a {
+            color: #ccc;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .dark-theme .menu-item a:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+        }
+        /* Responsive cho Menu */
+        
+        @media (max-width: 768px) {
+            .top-right-nav {
+                position: static;
+                /* Đưa menu về vị trí bình thường trên di động */
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .menu {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 
 <body class="bg-triangles">
+    <video autoplay muted loop id="background-video">
+        <source src="assets\icons\theme.mp4" type="video/mp4"> 
+        Trình duyệt của bạn không hỗ trợ video nền.
+    </video>
     <div id="top-td"></div>
     <div class="preloader">
         <div class="preloader__wrap">
@@ -134,161 +271,149 @@
             </div>
         </div>
     </div>
-    <main class="main">
-        <div class="container gutter-top">
-            <div class="row sticky-parent">
-                <!-- Sidebar -->
-                <aside class="col-12 col-md-12 col-xl-3">
-                    <div class="sidebar box pb-0 sticky-column">
-                        <div class="text-center">
-                            <img class="ft-logo" src="https://s.ibytecdn.org/https://sf-static.upanhlaylink.com/img/image_20251118405b2e3c131431afc1f933e38baafaef.jpg" />
-                            <h3 class="title title--h3 sidebar__user-name td-name">
-                                <span class="weight--500 td-name">Vu Dinh Khu <img class="td-verify"
-                                        src="" /><br>
+    </nav>
+    <div class="container gutter-top">
+        <div class="row sticky-parent">
+            <aside class="col-12 col-md-12 col-xl-3">
+                <div class="sidebar box pb-0 sticky-column">
+                    <div class="text-center">
+                        <img class="ft-logo" src="https://sf-static.upanhlaylink.com/img/image_20251201865689d5113e1d8f4823fac432de6b03.jpg" />
+                        <h3 class="title title--h3 sidebar__user-name td-name">
+                            <span class="weight--500 td-name">Vu Dinh Khu <img class="td-verify"
+                                            src="" /><br>
                                     <div class="badge badge--gray td-bio">@ItsMeemo123</div>
-                            </h3>
-                            <!-- Social Icons - Đã sửa viền trắng icon màu -->
-                            <div class="sidebar__info box-inner box-inner--rounded">
-                                <div class="social-icons">
-                                    <!-- Facebook -->
-                                    <a href="https://www.facebook.com/vu.khu.721568" target="_blank" class="social-icon facebook">
-                                        <i class="fab fa-facebook-f"></i>
-                                        <span class="tooltip">Facebook</span>
+                                </span>
+                        </h3>
+                        <div class="sidebar__info box-inner box-inner--rounded">
+                            <div class="social-icons">
+                                <a href="https://www.facebook.com/vu.khu.721568" target="_blank" class="social-icon facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                    <span class="tooltip">Facebook</span>
                                 </a>
 
-                                <!-- TikTok -->
                                 <a href="https://www.tiktok.com/@vukhu0711?_r=1&_t=ZS-91VTv00EmKf" target="_blank" class="social-icon tiktok">
                                     <i class="fab fa-tiktok"></i>
                                     <span class="tooltip">TikTok</span>
                                 </a>
 
-                                <!-- Telegram -->
                                 <a href="https://t.me/ItsMeemo123" target="_blank" class="social-icon telegram">
                                     <i class="fab fa-telegram-plane"></i>
                                     <span class="tooltip">Telegram</span>
                                 </a>
-                        </div>
-                    </div>
-            </div>
-        </div>
-        </aside>
-        <!-- Content -->
-        <div class="col-12 col-md-12 col-xl-9">
-            <div class="box pb-0">
-                <!-- What -->
-                <div class="box-inner pb-0">
-                    <h1 class="title title--h3 title__separate">Info</h1>
-                    <div class="row">
-                        <!-- Case Item -->
-                        <div class="col-12 col-lg-6">
-                            <div class="case-item box box__second">
-                                <div>
-                                    <h3 class="title title--h5">Vũ Đình Khu</h3>
-                                    <p class="case-item__caption">
-                                        Họ và tên
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Case Item -->
-                        <div class="col-12 col-lg-6">
-                            <div class="case-item box box__second">
-                                <div>
-                                    <h3 class="title title--h5">07/11/2008</h3>
-                                    <p class="case-item__caption">
-                                        Ngày sinh
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Case Item -->
-                        <div class="col-12 col-lg-6">
-                            <div class="case-item box box__second">
-                                <div>
-                                    <h3 class="title title--h5">From Gia Bình-Bắc Ninh</h3>
-                                    <p class="case-item__caption">
-                                        Quê quán
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Case Item -->
-                        <div class="col-12 col-lg-6">
-                            <div class="case-item box box__second">
-                                <div>
-                                    <h3 class="title title--h5">Living my best peaceful life</h3>
-                                    <p class="case-item__caption">
-
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </aside>
+            <div class="col-12 col-md-12 col-xl-9">
+                <div class="box pb-0">
+                    <div class="box-inner pb-0">
+                        <h1 class="title title--h3 title__separate">Info</h1>
+                        <div class="row">
+                            <div class="col-12 col-lg-6">
+                                <div class="case-item box box__second">
+                                    <div>
+                                        <h3 class="title title--h5">Vũ Đình Khu</h3>
+                                        <p class="case-item__caption">
+                                            Họ và tên
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <div class="case-item box box__second">
+                                    <div>
+                                        <h3 class="title title--h5">07/11/2008</h3>
+                                        <p class="case-item__caption">
+                                            Ngày sinh
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <div class="case-item box box__second">
+                                    <div>
+                                        <h3 class="title title--h5"> Gia Bình-Bắc Ninh</h3>
+                                        <p class="case-item__caption">
+                                            Quê quán
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-lg-6">
+                                <div class="case-item box box__second">
+                                    <div>
+                                        <h3 class="title title--h5">Living my best peaceful life</h3>
+                                        <p class="case-item__caption">
 
-                <!-- Testimonials -->
-                <div class="box-inner box-inner--rounded">
-                    <h2 class="title title--h3 title__separate">About Me</h2>
-                    <div class="swiper-container js-carousel-review">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide review-item">
-                                <svg class="avatar avatar--80" viewBox="0 0 84 84">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="box-inner box-inner--rounded">
+                        <h2 class="title title--h3 title__separate">About Me</h2>
+                        <div class="swiper-container js-carousel-review">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide review-item">
+                                    <svg class="avatar avatar--80" viewBox="0 0 84 84">
                                             <g class="avatar__hexagon">
                                                 <image xlink:href="https://i.imgur.com/pn00UUp.gif" height="100%"
                                                     width="100%" />
                                             </g>
                                         </svg>
-                                <h4 class="title title--h5">
-                                    <a class="td-caption" href="#">Thả Thính</a>
-                                </h4>
-                                <p class="review-item__caption">Tuy anh nghèo, nhưng anh cũng không có tiền</p>
-                            </div>
-                            <div class="swiper-slide review-item">
-                                <svg class="avatar avatar--80" viewBox="0 0 84 84">
+                                    <h4 class="title title--h5">
+                                        <a class="td-caption" href="#">Thả Thính</a>
+                                    </h4>
+                                    <p class="review-item__caption">Tuy anh nghèo, nhưng anh cũng không có tiền</p>
+                                </div>
+                                <div class="swiper-slide review-item">
+                                    <svg class="avatar avatar--80" viewBox="0 0 84 84">
                                             <g class="avatar__hexagon">
                                                 <image xlink:href="https://i.imgur.com/Nao5Nvi.png" height="100%"
                                                     width="100%" />
                                             </g>
                                         </svg>
-                                <h4 class="title title--h5">
-                                    <a class="td-caption" href="#">Châm Ngôn</a>
-                                </h4>
-                                <p class="review-item__caption">Có tiền thì có tất cả</p>
+                                    <h4 class="title title--h5">
+                                        <a class="td-caption" href="#">Châm Ngôn</a>
+                                    </h4>
+                                    <p class="review-item__caption">Có tiền thì có tất cả</p>
+                                </div>
                             </div>
+                            <div class="swiper-pagination"></div>
                         </div>
-                        <div class="swiper-pagination"></div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-        </div>
+    </div>
 
-        <div class="corner-icon-container">
-            <div class="corner-icon corner-icon-moon">
-                <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Toggle Display Theme">
-                    <img height="23" width="23" src="./assets/icons/moon-td.svg" alt="Dark Mode">
-                </a>
-            </div>
-            <div class="corner-icon corner-icon-qrcode">
-                <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Mã qr của trang này">
-                    <img height="24" width="24" src="./assets/icons/qr-code-td.svg" alt="QR Code">
-                </a>
-            </div>
-            <div class="corner-icon corner-icon-github">
-                <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Github của tôi">
-                    <img height="20" width="20" src="./assets/icons/github-color-td.svg" alt="My github">
-                </a>
-            </div>
-            <div class="corner-icon corner-icon-scroll" id="scrollToTop">
-                <a class="" data-toggle="tooltip" data-placement="left">
-                    <i class="fa fa-angle-up td-scroll"></i>
-                </a>
-            </div>
+    <div class="corner-icon-container">
+        <div class="corner-icon corner-icon-moon">
+            <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Toggle Display Theme">
+                <img height="23" width="23" src="./assets/icons/moon-td.svg" alt="Dark Mode">
+            </a>
         </div>
-        <footer style="text-transform: capitalize;" class="footer">Copybright ©️ -
-            <a id="website" href="https://vukhuxxx.github.io/profilex" target="_blank">VuDinhKhu</a>
-        </footer>
+        <div class="corner-icon corner-icon-qrcode">
+            <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Mã qr của trang này">
+                <img height="24" width="24" src="./assets/icons/qr-code-td.svg" alt="QR Code">
+            </a>
+        </div>
+        <div class="corner-icon corner-icon-github">
+            <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Github của tôi">
+                <img height="20" width="20" src="./assets/icons/github-color-td.svg" alt="My github">
+            </a>
+        </div>
+        <div class="corner-icon corner-icon-scroll" id="scrollToTop">
+            <a class="" data-toggle="tooltip" data-placement="left">
+                <i class="fa fa-angle-up td-scroll"></i>
+            </a>
+        </div>
+    </div>
+
+    </footer>
     </main>
     <script src="./assets/js/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
