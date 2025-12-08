@@ -39,6 +39,8 @@
             background-size: cover;
             filter: brightness(50%);
             /* Giảm độ sáng của video */
+            object-fit: cover;
+            /* Đảm bảo video lấp đầy màn hình */
         }
         /* Đảm bảo nội dung chính nằm trên video */
         
@@ -185,6 +187,8 @@
         .bg-triangles {
             /* Vô hiệu hóa hình nền tam giác ban đầu nếu có, hoặc thay thế */
             background-image: none !important;
+            /* Đặt một ảnh nền tĩnh mặc định khi video bị ẩn */
+            background-color: #0a0a0a;
         }
         /* --- CSS MỚI CHO MENU --- */
         
@@ -247,15 +251,31 @@
                 justify-content: center;
                 flex-wrap: wrap;
             }
+            /* **QUAN TRỌNG: Ẩn video nền để tránh lag trên mobile** */
+            #background-video {
+                display: none;
+            }
+            .bg-triangles {
+                /* Nếu bạn muốn dùng ảnh nền tĩnh trên mobile */
+                /* background-image: url('assets/images/mobile_bg.jpg'); */
+                /* background-size: cover; */
+            }
         }
     </style>
 </head>
 
 <body class="bg-triangles">
-    <video autoplay muted loop id="background-video">
+    <video autoplay muted loop id="background-video" preload="auto" poster="https://sf-static.upanhlaylink.com/img/image_20251108b09badd37d480b4c1dce9d8039b7c9b0.jpg">
         <source src="assets\icons\theme.mp4" type="video/mp4"> 
         Trình duyệt của bạn không hỗ trợ video nền.
     </video>
+
+    <div class="top-right-nav">
+        <ul class="menu">
+            <li class="menu-item"><a href="#top-td">HOME</a></li>
+            <li class="menu-item"><a href="https://blog.thanhdieu.com" target="_blank">BLOG</a></li>
+        </ul>
+    </div>
     <div id="top-td"></div>
     <div class="preloader">
         <div class="preloader__wrap">
@@ -280,8 +300,8 @@
                         <img class="ft-logo" src="https://sf-static.upanhlaylink.com/img/image_20251201865689d5113e1d8f4823fac432de6b03.jpg" />
                         <h3 class="title title--h3 sidebar__user-name td-name">
                             <span class="weight--500 td-name">Vu Dinh Khu <img class="td-verify"
-                                            src="" /><br>
-                                    <div class="badge badge--gray td-bio">@ItsMeemo123</div>
+                                        src="" /><br>
+                                        <div class="badge badge--gray td-bio">@ItsMeemo123</div>
                                 </span>
                         </h3>
                         <div class="sidebar__info box-inner box-inner--rounded">
@@ -402,7 +422,7 @@
             </a>
         </div>
         <div class="corner-icon corner-icon-github">
-            <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Github của tôi">
+            <a href="Đường_dẫn_Github_của_tôi" target="_blank" data-toggle="tooltip" data-placement="left" data-original-title="Github của tôi">
                 <img height="20" width="20" src="./assets/icons/github-color-td.svg" alt="My github">
             </a>
         </div>
@@ -431,13 +451,23 @@
         function wussunplay() {
             audio.play()
         }
-        document.addEventListener("click", wussunplay()), audio.addEventListener("ended", function() {
+
+        // SỬA: Chỉ lắng nghe click một lần để play nhạc
+        document.addEventListener("click", function startAudio() {
+            audio.play().catch(e => console.log("Audio play failed:", e));
+            document.removeEventListener("click", startAudio); // Dừng lắng nghe sau lần click đầu
+        });
+
+        audio.addEventListener("ended", function() {
             rand = (rand + 1) % Wussun_Music.length, audio.src = Wussun_Music[rand], audio.play()
         });
         let avatar = 'https://sf-static.upanhlaylink.com/img/image_20251108b09badd37d480b4c1dce9d8039b7c9b0.jpg';
         let fullname = 'Welcome';
         let facebook = 'https://www.facebook.com/vu.khu.721568';
         let zalo = 'https://';
+        let githubUrl = 'https://github.com/VuDinhKhu'; // THAY THẾ URL GITHUB CỦA BẠN
+        let blogUrl = 'https://blog.thanhdieu.com'; // THAY THẾ URL BLOG CỦA BẠN
+
         window.addEventListener("DOMContentLoaded", function() {
             window.MyNavCard = $MGC({
                 icon: `${avatar}`,
@@ -459,10 +489,10 @@
                 },
                 iconLinks: [{
                     "title": "My Github",
-
+                    "url": `${githubUrl}` // Đã sửa
                 }, {
                     "title": "My Blog",
-
+                    "url": `${blogUrl}` // Đã sửa
                 }, ],
                 links: [{
                     "title": "Contact Facebook",
@@ -476,6 +506,24 @@
                     "target": "_blank"
                 }, ],
             });
+        });
+
+        // **Thêm JavaScript để điều chỉnh video nền sau khi preloader kết thúc (Nếu preloader có class .preloader)**
+        window.addEventListener('load', function() {
+            const preloader = document.querySelector('.preloader');
+            const video = document.getElementById('background-video');
+
+            if (preloader) {
+                // Giả định preloader biến mất sau 500ms (hoặc theo logic của common.min.js)
+                // Kích hoạt video sau khi preloader đã hoàn tất 
+                setTimeout(() => {
+                    if (video && video.paused) {
+                        video.play().catch(e => console.error("Video auto-play failed after load:", e));
+                    }
+                }, 500);
+            } else if (video && video.paused) {
+                video.play().catch(e => console.error("Video auto-play failed on load:", e));
+            }
         });
     </script>
 </body>
