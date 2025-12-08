@@ -263,7 +263,7 @@
 
 <body class="bg-triangles">
     <video autoplay muted loop id="background-video" preload="auto" poster="https://sf-static.upanhlaylink.com/img/image_20251108b09badd37d480b4c1dce9d8039b7c9b0.jpg" playsinline>
-        <source src="assets\icons\theme.mp4" type="video/mp4">
+        <source src="assets/icons/theme.mp4" type="video/mp4">
         Trình duyệt của bạn không hỗ trợ video nền.
     </video>
 
@@ -503,22 +503,26 @@
             });
         });
 
-        // **[SỬA LỖI LOAD VIDEO & AUTOPLAY]** Sử dụng Promise và canplaythrough để kiểm soát trình tự load và play
+        // **[SỬA LỖI LOAD VIDEO & AUTOPLAY MỚI]** Sử dụng Promise và canplaythrough để kiểm soát trình tự load và play
         window.addEventListener('load', function() {
             const preloader = document.querySelector('.preloader');
             const video = document.getElementById('background-video');
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
             // Nếu là mobile, không chạy logic video (vì đã ẩn bằng CSS media query)
-            if (isMobile) return;
+            if (isMobile || !video) return;
 
             // Hàm kích hoạt video (hiển thị và cố gắng phát)
             function startVideoPlayback() {
+                // Kiểm tra nếu đã kích hoạt thì không làm lại
+                if (video.classList.contains('video-ready')) return;
+
                 const playPromise = video.play();
 
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         // Phát thành công: Thêm class để video hiện dần lên
+                        console.log("Video played successfully.");
                         setTimeout(() => {
                             video.classList.add('video-ready');
                         }, 500); // Chờ 500ms sau khi preloader kết thúc (theo logic common.min.js)
