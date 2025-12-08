@@ -41,14 +41,14 @@
             /* Giảm độ sáng của video */
             object-fit: cover;
             /* Đảm bảo video lấp đầy màn hình */
-            /* **QUAN TRỌNG: Mặc định ẩn video để tránh nhấp nháy/hiển thị sớm** */
+            /* **[SỬA LỖI LOAD SỚM]** Mặc định ẩn video */
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.8s ease;
         }
-        /* Khi video sẵn sàng và preloader kết thúc, thêm class này để hiển thị */
+        /* **[SỬA LỖI LOAD SỚM]** Khi video sẵn sàng và preloader kết thúc, thêm class này để hiển thị */
         
-        .video-loaded-and-ready #background-video {
-            opacity: 1;
+        .video-ready {
+            opacity: 1 !important;
         }
         /* Đảm bảo nội dung chính nằm trên video */
         
@@ -205,7 +205,6 @@
             top: 20px;
             right: 20px;
             z-index: 100;
-            /* Đảm bảo menu nằm trên các phần tử khác */
         }
         
         .menu {
@@ -219,9 +218,7 @@
         .menu-item a {
             text-decoration: none;
             color: white;
-            /* Màu chữ trắng cho dễ nhìn trên nền video */
             background-color: rgba(0, 0, 0, 0.6);
-            /* Nền đen mờ */
             padding: 8px 15px;
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
@@ -253,12 +250,11 @@
                 display: none;
                 /* Ẩn menu trên mobile nếu muốn */
             }
-            /* **QUAN TRỌNG: Ẩn video nền để tránh lag trên mobile** */
+            /* **[SỬA LỖI MOBILE]** Ẩn video nền để tránh lag trên mobile và hiển thị màu nền tĩnh */
             #background-video {
                 display: none;
             }
             .bg-triangles {
-                /* Đảm bảo nền màu đen tĩnh trên mobile */
                 background-color: #0a0a0a !important;
             }
         }
@@ -266,12 +262,14 @@
 </head>
 
 <body class="bg-triangles">
-    <video autoplay muted loop id="background-video" preload="auto" poster="https://sf-static.upanhlaylink.com/img/image_20251108b09badd37d480b4c1dce9d8039b7c9b0.jpg">
+    <video autoplay muted loop id="background-video" preload="auto" poster="https://sf-static.upanhlaylink.com/img/image_20251108b09badd37d480b4c1dce9d8039b7c9b0.jpg" playsinline>
         <source src="assets\icons\theme.mp4" type="video/mp4">
         Trình duyệt của bạn không hỗ trợ video nền.
     </video>
 
     <div class="top-right-nav">
+        <ul class="menu">
+        </ul>
     </div>
     <div id="top-td"></div>
     <div class="preloader">
@@ -449,7 +447,7 @@
             audio.play()
         }
 
-        // SỬA: Chỉ lắng nghe click một lần để play nhạc
+        // SỬA: Chỉ lắng nghe click một lần để play nhạc nền
         document.addEventListener("click", function startAudio() {
             audio.play().catch(e => console.log("Audio play failed:", e));
             document.removeEventListener("click", startAudio); // Dừng lắng nghe sau lần click đầu
@@ -505,39 +503,55 @@
             });
         });
 
-        // **THAY ĐỔI: Sử dụng sự kiện 'canplay' để đảm bảo video tải xong và chỉ hiển thị khi preloader kết thúc**
+        // **[SỬA LỖI LOAD VIDEO & AUTOPLAY]** Sử dụng Promise và canplaythrough để kiểm soát trình tự load và play
         window.addEventListener('load', function() {
             const preloader = document.querySelector('.preloader');
             const video = document.getElementById('background-video');
+            const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-            // Hàm kích hoạt video và ẩn preloader
-            function activateContent() {
-                // Thêm class để video hiện dần lên (opacity: 1)
-                document.body.classList.add('video-loaded-and-ready');
-                // Nếu preloader có logic ẩn sau khi load, nó sẽ tự xử lý.
-                // Nếu cần ẩn preloader thủ công: 
-                // if (preloader) { preloader.style.display = 'none'; } 
+            // Nếu là mobile, không chạy logic video (vì đã ẩn bằng CSS media query)
+            if (isMobile) return;
+
+            // Hàm kích hoạt video (hiển thị và cố gắng phát)
+            function startVideoPlayback() {
+                const playPromise = video.play();
+
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // Phát thành công: Thêm class để video hiện dần lên
+                        setTimeout(() => {
+                            video.classList.add('video-ready');
+                        }, 500); // Chờ 500ms sau khi preloader kết thúc (theo logic common.min.js)
+                    }).catch(error => {
+                        // Phát thất bại (bị trình duyệt chặn autoplay)
+                        console.warn("Video autoplay blocked. Making it visible immediately with poster image.", error);
+                        // Nếu không thể chạy, vẫn hiển thị video (dùng poster/ảnh tĩnh)
+                        video.classList.add('video-ready');
+                        // Gỡ bỏ thuộc tính `autoplay` để trình duyệt không cố gắng phát lại
+                        video.removeAttribute('autoplay');
+                    });
+                } else {
+                    // Trình duyệt cũ, chỉ hiển thị
+                    setTimeout(() => {
+                        video.classList.add('video-ready');
+                    }, 500);
+                }
             }
 
             if (video) {
-                // Lắng nghe sự kiện video đã sẵn sàng để phát (đã tải đủ dữ liệu)
-                video.addEventListener('canplay', () => {
-                    // Chờ thêm một khoảng ngắn sau khi preloader ẩn đi (giả định preloader biến mất sau 500ms theo logic common.min.js)
-                    setTimeout(activateContent, 500);
-                    video.play().catch(e => console.error("Video auto-play failed after canplay:", e));
-                }, {
+                // Lắng nghe sự kiện video đã tải đủ dữ liệu để phát mượt mà
+                video.addEventListener('canplaythrough', startVideoPlayback, {
                     once: true
                 });
 
-                // Đề phòng trường hợp preloader không tồn tại hoặc lỗi, vẫn kích hoạt video sau 1s
+                // Giải pháp dự phòng: Nếu sự kiện canplaythrough không bắn (do lỗi tải hoặc trình duyệt),
+                // cố gắng kích hoạt sau 1.5 giây kể từ khi trang load xong.
                 setTimeout(() => {
-                    if (!document.body.classList.contains('video-loaded-and-ready')) {
-                        activateContent();
+                    // Nếu video chưa được kích hoạt, hãy kích hoạt nó
+                    if (!video.classList.contains('video-ready')) {
+                        startVideoPlayback();
                     }
-                }, 1000);
-            } else {
-                // Nếu không có video, vẫn kích hoạt nội dung
-                setTimeout(activateContent, 500);
+                }, 1500);
             }
         });
     </script>
