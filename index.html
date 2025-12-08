@@ -41,6 +41,14 @@
             /* Giảm độ sáng của video */
             object-fit: cover;
             /* Đảm bảo video lấp đầy màn hình */
+            /* **QUAN TRỌNG: Mặc định ẩn video để tránh nhấp nháy/hiển thị sớm** */
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        /* Khi video sẵn sàng và preloader kết thúc, thêm class này để hiển thị */
+        
+        .video-loaded-and-ready #background-video {
+            opacity: 1;
         }
         /* Đảm bảo nội dung chính nằm trên video */
         
@@ -242,23 +250,16 @@
         
         @media (max-width: 768px) {
             .top-right-nav {
-                position: static;
-                /* Đưa menu về vị trí bình thường trên di động */
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            .menu {
-                justify-content: center;
-                flex-wrap: wrap;
+                display: none;
+                /* Ẩn menu trên mobile nếu muốn */
             }
             /* **QUAN TRỌNG: Ẩn video nền để tránh lag trên mobile** */
             #background-video {
                 display: none;
             }
             .bg-triangles {
-                /* Nếu bạn muốn dùng ảnh nền tĩnh trên mobile */
-                /* background-image: url('assets/images/mobile_bg.jpg'); */
-                /* background-size: cover; */
+                /* Đảm bảo nền màu đen tĩnh trên mobile */
+                background-color: #0a0a0a !important;
             }
         }
     </style>
@@ -266,15 +267,11 @@
 
 <body class="bg-triangles">
     <video autoplay muted loop id="background-video" preload="auto" poster="https://sf-static.upanhlaylink.com/img/image_20251108b09badd37d480b4c1dce9d8039b7c9b0.jpg">
-        <source src="assets\icons\theme.mp4" type="video/mp4"> 
+        <source src="assets\icons\theme.mp4" type="video/mp4">
         Trình duyệt của bạn không hỗ trợ video nền.
     </video>
 
     <div class="top-right-nav">
-        <ul class="menu">
-            <li class="menu-item"><a href="#top-td">HOME</a></li>
-            <li class="menu-item"><a href="https://blog.thanhdieu.com" target="_blank">BLOG</a></li>
-        </ul>
     </div>
     <div id="top-td"></div>
     <div class="preloader">
@@ -301,7 +298,7 @@
                         <h3 class="title title--h3 sidebar__user-name td-name">
                             <span class="weight--500 td-name">Vu Dinh Khu <img class="td-verify"
                                         src="" /><br>
-                                        <div class="badge badge--gray td-bio">@ItsMeemo123</div>
+                                    <div class="badge badge--gray td-bio">@ItsMeemo123</div>
                                 </span>
                         </h3>
                         <div class="sidebar__info box-inner box-inner--rounded">
@@ -508,21 +505,39 @@
             });
         });
 
-        // **Thêm JavaScript để điều chỉnh video nền sau khi preloader kết thúc (Nếu preloader có class .preloader)**
+        // **THAY ĐỔI: Sử dụng sự kiện 'canplay' để đảm bảo video tải xong và chỉ hiển thị khi preloader kết thúc**
         window.addEventListener('load', function() {
             const preloader = document.querySelector('.preloader');
             const video = document.getElementById('background-video');
 
-            if (preloader) {
-                // Giả định preloader biến mất sau 500ms (hoặc theo logic của common.min.js)
-                // Kích hoạt video sau khi preloader đã hoàn tất 
+            // Hàm kích hoạt video và ẩn preloader
+            function activateContent() {
+                // Thêm class để video hiện dần lên (opacity: 1)
+                document.body.classList.add('video-loaded-and-ready');
+                // Nếu preloader có logic ẩn sau khi load, nó sẽ tự xử lý.
+                // Nếu cần ẩn preloader thủ công: 
+                // if (preloader) { preloader.style.display = 'none'; } 
+            }
+
+            if (video) {
+                // Lắng nghe sự kiện video đã sẵn sàng để phát (đã tải đủ dữ liệu)
+                video.addEventListener('canplay', () => {
+                    // Chờ thêm một khoảng ngắn sau khi preloader ẩn đi (giả định preloader biến mất sau 500ms theo logic common.min.js)
+                    setTimeout(activateContent, 500);
+                    video.play().catch(e => console.error("Video auto-play failed after canplay:", e));
+                }, {
+                    once: true
+                });
+
+                // Đề phòng trường hợp preloader không tồn tại hoặc lỗi, vẫn kích hoạt video sau 1s
                 setTimeout(() => {
-                    if (video && video.paused) {
-                        video.play().catch(e => console.error("Video auto-play failed after load:", e));
+                    if (!document.body.classList.contains('video-loaded-and-ready')) {
+                        activateContent();
                     }
-                }, 500);
-            } else if (video && video.paused) {
-                video.play().catch(e => console.error("Video auto-play failed on load:", e));
+                }, 1000);
+            } else {
+                // Nếu không có video, vẫn kích hoạt nội dung
+                setTimeout(activateContent, 500);
             }
         });
     </script>
