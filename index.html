@@ -21,36 +21,47 @@
     <link rel="stylesheet" type="text/css" href="./assets/styles/style.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
     <link rel="stylesheet" href="./assets/styles/porn-hub.css">
-    <link id="dark-style" class="dark-theme" rel="stylesheet" href="./assets/styles/style-dark.css">
     <style>
-        /* CSS cho Video Nền */
+        /* CSS cho Background Image */
+        /* *** [SỬA LỖI THEME] Áp dụng ảnh nền bằng pseudo-element trên Body */
         
-        #background-video {
+        .bg-triangles {
+            /* Đặt màu nền tĩnh dự phòng */
+            background-color: #0a0a0a !important;
+            /* Rất quan trọng: Xóa background-image trực tiếp trên body để tránh xung đột */
+            background-image: none !important;
+            /* Đảm bảo nội dung không bị filter */
+            filter: none !important;
+            /* Đảm bảo màu chữ mặc định là trắng/sáng cho toàn bộ body */
+            color: #f5f5f5 !important;
+            /* Màu trắng sáng (gần trắng) */
+        }
+        
+        .bg-triangles::before {
+            content: '';
             position: fixed;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: -100;
             /* Đặt phía sau mọi thứ */
-            transform: translateX(-50%) translateY(-50%);
+            /* THAY THẾ BẰNG ĐƯỜNG DẪN HÌNH ẢNH CỦA BẠN */
+            background-image: url('https://sf-static.upanhlaylink.com/img/image_20251211391a5ccf49ec4cc5de7b900599485161.jpg');
             background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Áp dụng hiệu ứng làm mờ/giảm độ sáng TẠI ĐÂY */
             filter: brightness(50%);
-            /* Giảm độ sáng của video */
-            object-fit: cover;
-            /* Đảm bảo video lấp đầy màn hình */
-            /* **[SỬA LỖI LOAD SỚM]** Mặc định ẩn video */
-            opacity: 0;
             transition: opacity 0.8s ease;
         }
-        /* **[SỬA LỖI LOAD SỚM]** Khi video sẵn sàng và preloader kết thúc, thêm class này để hiển thị */
+        /* Xóa các quy tắc video cũ không cần thiết */
         
+        #background-video,
         .video-ready {
-            opacity: 1 !important;
+            display: none !important;
         }
-        /* Đảm bảo nội dung chính nằm trên video */
+        /* Đảm bảo nội dung chính nằm trên nền ảnh */
         
         .main {
             position: relative;
@@ -80,7 +91,7 @@
             /* Tăng shadow để nổi bật */
             border: 2px solid white;
             background: rgba(255, 255, 255, 0.9);
-            /* Làm mờ nền icon */
+            /* Làm mờ nền icon (Vẫn giữ nền sáng cho icon để nổi bật) */
         }
         
         .social-icon::before {
@@ -152,52 +163,52 @@
             border-style: solid;
             border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
         }
-        /* 1. Đảm bảo nội dung có độ trong suốt để nhìn thấy video nền */
+        /* 1. Đảm bảo nội dung có độ trong suốt để nhìn thấy nền */
         
         .box {
             /* Giảm opacity của nền trắng */
             background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(5px);
+            /* Đảm bảo màu chữ hiển thị tốt trên nền sáng mặc định */
+            color: #000000;
         }
-        /* 2. Fix Dark Mode và độ trong suốt cho nền Dark */
+        /* ********** PHẦN QUAN TRỌNG: CHUYỂN TOÀN BỘ CHỮ SANG MÀU TRẮNG SÁNG ********** */
+        /* 1. Thay đổi màu chữ cho tất cả các tiêu đề và chữ thường trong .box và .bg-triangles */
         
-        .dark-theme .box {
-            /* Thay đổi màu nền sang đen mờ */
-            background-color: rgba(30, 30, 30, 0.85);
-            /* Đảm bảo màu chữ hiển thị tốt trên nền đen */
-            color: #ffffff;
-        }
-        /* 3. Fix lỗi mất chữ (tiêu đề, chữ thường) khi chuyển Dark Mode */
-        
-        .dark-theme h1,
-        .dark-theme h3,
-        .dark-theme h4,
-        .dark-theme h5,
-        .dark-theme .title,
-        .dark-theme .title__separate::before,
-        .dark-theme .title__separate::after {
+        .box h1,
+        .box h3,
+        .box h4,
+        .box h5,
+        .box .title,
+        .box .title__separate::before,
+        .box .title__separate::after,
+        .box p,
+        .box .case-item__caption,
+        .box .review-item__caption,
+        .bg-triangles .td-name,
+        .bg-triangles .td-bio {
             color: #ffffff !important;
-            /* Đặt màu chữ trắng cho tất cả tiêu đề */
+            /* Màu trắng sáng tuyệt đối */
+        }
+        /* 2. Đổi màu nền của khối chính (box) và khối con (box__second) sang màu tối/trong suốt */
+        
+        .box {
+            /* Nền tối trong suốt cho khối chính */
+            background-color: rgba(30, 30, 30, 0.85) !important;
+            color: #ffffff !important;
         }
         
-        .dark-theme p,
-        .dark-theme .case-item__caption,
-        .dark-theme .review-item__caption {
-            color: #cccccc;
-            /* Màu xám nhạt cho chữ thường */
-        }
-        /* 4. Đảm bảo màu nền của các khối con (case-item) cũng thay đổi */
-        
-        .dark-theme .box__second {
+        .box__second {
+            /* Nền tối hơn một chút cho khối con */
             background-color: rgba(45, 45, 45, 0.85) !important;
         }
+        /* 3. Đảm bảo các liên kết trong nội dung cũng có màu sáng */
         
-        .bg-triangles {
-            /* Vô hiệu hóa hình nền tam giác ban đầu nếu có, hoặc thay thế */
-            background-image: none !important;
-            /* Đặt một ảnh nền tĩnh mặc định khi video bị ẩn */
-            background-color: #0a0a0a;
+        .box a {
+            color: #90caf9 !important;
+            /* Màu xanh nhạt cho link */
         }
+        /* ********** LOẠI BỎ DARK MODE CSS ********** */
         /* --- CSS MỚI CHO MENU --- */
         
         .top-right-nav {
@@ -217,29 +228,20 @@
         
         .menu-item a {
             text-decoration: none;
-            color: white;
-            background-color: rgba(0, 0, 0, 0.6);
+            color: #ccc;
+            /* Màu chữ sáng cho Menu */
+            background-color: rgba(255, 255, 255, 0.2);
+            /* Nền sáng mờ */
             padding: 8px 15px;
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
             font-weight: 600;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            /* Viền sáng */
         }
         
         .menu-item a:hover {
-            background-color: rgba(255, 255, 255, 0.9);
-            color: #000;
-        }
-        /* Tối ưu cho Dark Mode */
-        
-        .dark-theme .menu-item a {
-            color: #ccc;
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        
-        .dark-theme .menu-item a:hover {
             background-color: rgba(255, 255, 255, 0.9);
             color: #000;
         }
@@ -248,25 +250,23 @@
         @media (max-width: 768px) {
             .top-right-nav {
                 display: none;
-                /* Ẩn menu trên mobile nếu muốn */
             }
-            /* **[SỬA LỖI MOBILE]** Ẩn video nền để tránh lag trên mobile và hiển thị màu nền tĩnh */
-            #background-video {
-                display: none;
+            /* Trên mobile, ẩn ảnh nền để tăng tốc độ load */
+            .bg-triangles::before {
+                display: none !important;
             }
+            /* Đảm bảo nền body là màu tĩnh trên mobile */
             .bg-triangles {
                 background-color: #0a0a0a !important;
+                background-image: none !important;
+                filter: none !important;
+                color: #f5f5f5 !important;
             }
         }
     </style>
 </head>
 
 <body class="bg-triangles">
-    <video autoplay muted loop id="background-video" preload="auto" poster="https://sf-static.upanhlaylink.co/img/image_02511dd37d480b4c1dce9d8039b7c9b0.jpg" playsinline>
-        <source src="assets/icons/theme.mp4" type="video/mp4">
-        Trình duyệt của bạn không hỗ trợ video nền.
-    </video>
-
     <div class="top-right-nav">
         <ul class="menu">
         </ul>
@@ -294,10 +294,9 @@
                     <div class="text-center">
                         <img class="ft-logo" src="https://sf-static.upanhlaylink.com/img/image_20251201865689d5113e1d8f4823fac432de6b03.jpg" />
                         <h3 class="title title--h3 sidebar__user-name td-name">
-                            <span class="weight--500 td-name">Vu Dinh Khu <img class="td-verify"
-                                        src="" /><br>
-                                    <div class="badge badge--gray td-bio">@ItsMeemo123</div>
-                                </span>
+                            <span class="weight--500 td-name">Vu Dinh Khu <img class="td-verify" src="" /><br>
+                                <div class="badge badge--gray td-bio">@ItsMeemo123</div>
+                            </span>
                         </h3>
                         <div class="sidebar__info box-inner box-inner--rounded">
                             <div class="social-icons">
@@ -374,11 +373,11 @@
                             <div class="swiper-wrapper">
                                 <div class="swiper-slide review-item">
                                     <svg class="avatar avatar--80" viewBox="0 0 84 84">
-                                            <g class="avatar__hexagon">
-                                                <image xlink:href="https://i.imgur.com/pn00UUp.gif" height="100%"
-                                                    width="100%" />
-                                            </g>
-                                        </svg>
+                                        <g class="avatar__hexagon">
+                                            <image xlink:href="https://i.imgur.com/pn00UUp.gif" height="100%"
+                                                width="100%" />
+                                        </g>
+                                    </svg>
                                     <h4 class="title title--h5">
                                         <a class="td-caption" href="#">Thả Thính</a>
                                     </h4>
@@ -386,11 +385,11 @@
                                 </div>
                                 <div class="swiper-slide review-item">
                                     <svg class="avatar avatar--80" viewBox="0 0 84 84">
-                                            <g class="avatar__hexagon">
-                                                <image xlink:href="https://i.imgur.com/Nao5Nvi.png" height="100%"
-                                                    width="100%" />
-                                            </g>
-                                        </svg>
+                                        <g class="avatar__hexagon">
+                                            <image xlink:href="https://i.imgur.com/Nao5Nvi.png" height="100%"
+                                                width="100%" />
+                                        </g>
+                                    </svg>
                                     <h4 class="title title--h5">
                                         <a class="td-caption" href="#">Châm Ngôn</a>
                                     </h4>
@@ -406,11 +405,6 @@
     </div>
 
     <div class="corner-icon-container">
-        <div class="corner-icon corner-icon-moon">
-            <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Toggle Display Theme">
-                <img height="23" width="23" src="./assets/icons/moon-td.svg" alt="Dark Mode">
-            </a>
-        </div>
         <div class="corner-icon corner-icon-qrcode">
             <a class="" data-toggle="tooltip" data-placement="left" data-original-title="Mã qr của trang này">
                 <img height="24" width="24" src="./assets/icons/qr-code-td.svg" alt="QR Code">
@@ -439,7 +433,7 @@
     <script src="./assets/js/js.cookie.js"></script>
     <script src="./assets/layui/hoa-roi.js"></script>
     <script>
-        const Wussun_Music = ["https://files.catbox.moe/6iqddn.m4a", ];
+        const Wussun_Music = ["https://files.catbox.moe/qp45ex.mp3", ];
         let rand = Math.floor(Math.random() * Wussun_Music.length);
         const audio = new Audio(Wussun_Music[rand]);
 
@@ -472,7 +466,7 @@
                 blur: ".main",
                 lang: "en-US",
                 mini: false,
-                darkmode: 2,
+                darkmode: 2, // Có thể đặt là 0 hoặc xóa nếu script không bắt buộc
                 maxWidth: "380px",
                 fontFamily: "",
                 closeDuration: 15000,
@@ -503,61 +497,7 @@
             });
         });
 
-        // **[SỬA LỖI LOAD VIDEO & AUTOPLAY MỚI]** Sử dụng Promise và canplaythrough để kiểm soát trình tự load và play
-        window.addEventListener('load', function() {
-            const preloader = document.querySelector('.preloader');
-            const video = document.getElementById('background-video');
-            const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-            // Nếu là mobile, không chạy logic video (vì đã ẩn bằng CSS media query)
-            if (isMobile || !video) return;
-
-            // Hàm kích hoạt video (hiển thị và cố gắng phát)
-            function startVideoPlayback() {
-                // Kiểm tra nếu đã kích hoạt thì không làm lại
-                if (video.classList.contains('video-ready')) return;
-
-                const playPromise = video.play();
-
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        // Phát thành công: Thêm class để video hiện dần lên
-                        console.log("Video played successfully.");
-                        setTimeout(() => {
-                            video.classList.add('video-ready');
-                        }, 500); // Chờ 500ms sau khi preloader kết thúc (theo logic common.min.js)
-                    }).catch(error => {
-                        // Phát thất bại (bị trình duyệt chặn autoplay)
-                        console.warn("Video autoplay blocked. Making it visible immediately with poster image.", error);
-                        // Nếu không thể chạy, vẫn hiển thị video (dùng poster/ảnh tĩnh)
-                        video.classList.add('video-ready');
-                        // Gỡ bỏ thuộc tính `autoplay` để trình duyệt không cố gắng phát lại
-                        video.removeAttribute('autoplay');
-                    });
-                } else {
-                    // Trình duyệt cũ, chỉ hiển thị
-                    setTimeout(() => {
-                        video.classList.add('video-ready');
-                    }, 500);
-                }
-            }
-
-            if (video) {
-                // Lắng nghe sự kiện video đã tải đủ dữ liệu để phát mượt mà
-                video.addEventListener('canplaythrough', startVideoPlayback, {
-                    once: true
-                });
-
-                // Giải pháp dự phòng: Nếu sự kiện canplaythrough không bắn (do lỗi tải hoặc trình duyệt),
-                // cố gắng kích hoạt sau 1.5 giây kể từ khi trang load xong.
-                setTimeout(() => {
-                    // Nếu video chưa được kích hoạt, hãy kích hoạt nó
-                    if (!video.classList.contains('video-ready')) {
-                        startVideoPlayback();
-                    }
-                }, 1500);
-            }
-        });
+        // Đã loại bỏ toàn bộ JavaScript xử lý Video nền
     </script>
 </body>
 
